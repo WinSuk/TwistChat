@@ -1,0 +1,16 @@
+PebbleType is currently just a typing demo, with plans for actual SMS functionality.
+
+Controls:
+- Wrist rotate: Choose letter/letter group
+- Select: Insert letter/select group
+- Select long-press: Send message (currently a placeholder)
+- Up: Shift > Caps lock > neither
+- Down: Backspace; return to group list
+
+Future plans:
+- Send SMS with threads & message history
+- Button labels & indicator for caps lock
+- Send confirmation
+- Customizable hotwords and emoticons
+
+I am very new to C (and Pebble), so pull requests & issues are definitely welcome :)
