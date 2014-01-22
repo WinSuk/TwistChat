@@ -93,7 +93,7 @@ static void down_click_handler(ClickRecognizerRef recognizer, void *context) {
 
 void select_long_click_handler(ClickRecognizerRef recognizer, void *context) {
   // Send message!
-  text_layer_set_text(text_layer_input, "Sending...\0");
+  text_layer_set_text(text_layer_input, "Sending...");
   DictionaryIterator *iter;
   app_message_outbox_begin(&iter);
   dict_write_cstring(iter, 1, input);
@@ -200,7 +200,7 @@ void in_received_handler(DictionaryIterator *received, void *context) {
   // incoming message received
   Tuple *msg_sent_tuple = dict_find(received, KEY_MESSAGE_SENT);
   if (msg_sent_tuple) {
-    text_layer_set_text(text_layer_input, "Message sent!\0");
+    text_layer_set_text(text_layer_input, "Message sent!");
   }
 }
 
