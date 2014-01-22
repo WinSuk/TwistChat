@@ -112,13 +112,13 @@ static void backspace_timer_callback(void *data) {
   }
 }
 
-void up_long_click_handler(ClickRecognizerRef recognizer, void *context) {
+void down_long_click_handler(ClickRecognizerRef recognizer, void *context) {
   // Start deleting stuff
   is_up_held = true;
   app_timer_register(150 /*milliseconds */, backspace_timer_callback, NULL);
 }
 
-void up_long_click_release_handler(ClickRecognizerRef recognizer, void *context) {
+void down_long_click_release_handler(ClickRecognizerRef recognizer, void *context) {
   // Stop deleting stuff
   is_up_held = false;
 }
@@ -128,7 +128,7 @@ static void click_config_provider(void *context) {
   window_single_click_subscribe(BUTTON_ID_UP, up_click_handler);
   window_single_click_subscribe(BUTTON_ID_DOWN, down_click_handler);
   window_long_click_subscribe(BUTTON_ID_SELECT, 700, select_long_click_handler, select_long_click_release_handler);
-  window_long_click_subscribe(BUTTON_ID_UP, 700, up_long_click_handler, up_long_click_release_handler);
+  window_long_click_subscribe(BUTTON_ID_DOWN, 700, down_long_click_handler, down_long_click_release_handler);
 }
 
 static void timer_callback(void *data) {
