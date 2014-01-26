@@ -96,7 +96,7 @@ void select_long_click_handler(ClickRecognizerRef recognizer, void *context) {
   text_layer_set_text(text_layer_input, "Sending...");
   DictionaryIterator *iter;
   app_message_outbox_begin(&iter);
-  dict_write_cstring(iter, 1, input);
+  dict_write_cstring(iter, KEY_SEND_MESSAGE, input);
   app_message_outbox_send();
 }
 
