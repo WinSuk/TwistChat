@@ -4,8 +4,8 @@ Controls:
 - Wrist rotate: Choose letter/letter group
 - Select: Insert letter/select group
 - Select long-press: Send message (currently a placeholder)
-- Up: Shift > Caps lock > neither
-- Down: Backspace; return to group list
+- Up: Backspace; return to group list
+- Down: Shift > Caps lock > neither
 
 Future plans:
 - Send SMS with threads & message history

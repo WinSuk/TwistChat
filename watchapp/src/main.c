@@ -70,6 +70,16 @@ static void select_click_handler(ClickRecognizerRef recognizer, void *context) {
 }
 
 static void up_click_handler(ClickRecognizerRef recognizer, void *context) {
+  // Backspace/back to group list
+  if (selected_set == -1) {
+    del_last_char(input);
+    text_layer_set_text(text_layer_input, input);
+  } else {
+    selected_set = -1;
+  }
+}
+
+static void down_click_handler(ClickRecognizerRef recognizer, void *context) {
   // Shift/caps
   if (caps) {
     caps = false;
@@ -78,16 +88,6 @@ static void up_click_handler(ClickRecognizerRef recognizer, void *context) {
     caps = true;
   } else {
     shift = true;
-  }
-}
-
-static void down_click_handler(ClickRecognizerRef recognizer, void *context) {
-  // Backspace/back to group list
-  if (selected_set == -1) {
-    del_last_char(input);
-    text_layer_set_text(text_layer_input, input);
-  } else {
-    selected_set = -1;
   }
 }
 
@@ -112,13 +112,13 @@ static void backspace_timer_callback(void *data) {
   }
 }
 
-void down_long_click_handler(ClickRecognizerRef recognizer, void *context) {
+void up_long_click_handler(ClickRecognizerRef recognizer, void *context) {
   // Start deleting stuff
   is_up_held = true;
   app_timer_register(150 /*milliseconds */, backspace_timer_callback, NULL);
 }
 
-void down_long_click_release_handler(ClickRecognizerRef recognizer, void *context) {
+void up_long_click_release_handler(ClickRecognizerRef recognizer, void *context) {
   // Stop deleting stuff
   is_up_held = false;
 }
@@ -128,7 +128,7 @@ static void click_config_provider(void *context) {
   window_single_click_subscribe(BUTTON_ID_UP, up_click_handler);
   window_single_click_subscribe(BUTTON_ID_DOWN, down_click_handler);
   window_long_click_subscribe(BUTTON_ID_SELECT, 700, select_long_click_handler, select_long_click_release_handler);
-  window_long_click_subscribe(BUTTON_ID_DOWN, 700, down_long_click_handler, down_long_click_release_handler);
+  window_long_click_subscribe(BUTTON_ID_UP, 700, up_long_click_handler, up_long_click_release_handler);
 }
 
 static void timer_callback(void *data) {
