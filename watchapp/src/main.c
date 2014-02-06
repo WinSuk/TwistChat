@@ -150,7 +150,9 @@ static void timer_callback(void *data) {
     }
   } else {
     display[0] = sets[selected_set][selected_item];
-    if (shift) display[0] -= 0x20;
+    if (shift && display[0] >= 0x61 && display[0] <= 0x7a) {
+      display[0] -= 0x20;
+    }
     display[1] = '\0';
   }
   
