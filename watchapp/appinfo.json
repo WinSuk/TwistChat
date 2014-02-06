@@ -3,8 +3,8 @@
   "shortName": "PebbleType",
   "longName": "PebbleType",
   "companyName": "WinSuk",
-  "versionCode": 1,
-  "versionLabel": "0.5.1",
+  "versionCode": 3,
+  "versionLabel": "0.5.2",
   "watchapp": {
     "watchface": false
   },
