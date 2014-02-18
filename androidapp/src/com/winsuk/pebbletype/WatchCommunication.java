@@ -77,20 +77,20 @@ public class WatchCommunication extends BroadcastReceiver {
 			sendThreadList(context);
 		}
 		
-    	if (data.contains(KEY_SEND_MESSAGE)) {
-    		String str = data.getString(KEY_SEND_MESSAGE);
-    		boolean demoMode = str.startsWith(";");
-    		
-    		String address = str.substring(0, str.indexOf(";"));
-    		String message = str.substring(str.indexOf(";") +1, str.length());
-    		
-    		if (!demoMode) {
-    			SmsManager sms = SmsManager.getDefault();
-    			sms.sendTextMessage(address, null, message, null, null);
-    			//TODO: sms.sendTextMessage(address, null, message, PendingIntent, null);
-    			sendByteToPebble(KEY_MESSAGE_SENT, (byte)1, context);
-    		}
-    	}
+		if (data.contains(KEY_SEND_MESSAGE)) {
+			String str = data.getString(KEY_SEND_MESSAGE);
+			boolean demoMode = str.startsWith(";");
+			
+			String address = str.substring(0, str.indexOf(";"));
+			String message = str.substring(str.indexOf(";") +1, str.length());
+			
+			if (!demoMode) {
+				SmsManager sms = SmsManager.getDefault();
+				sms.sendTextMessage(address, null, message, null, null);
+				//TODO: sms.sendTextMessage(address, null, message, PendingIntent, null);
+				sendByteToPebble(KEY_MESSAGE_SENT, (byte)1, context);
+			}
+		}
 	}
 	
 	private void sendThreadList(Context context) {
