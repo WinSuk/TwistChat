@@ -1,16 +1,20 @@
-PebbleType is currently just a typing demo, with plans for actual SMS functionality.
+Type and send SMS with your wrist - using Pebble's accelerometer!
+Great for short replies, and capable of long messages if desired.
+Pick from your 5 most recent threads to send a message.
 
-Controls:
+The typing UI is a bit lacking right now, so here are the controls:
 - Wrist rotate: Choose letter/letter group
 - Select: Insert letter/select group
-- Select long-press: Send message (currently a placeholder)
-- Up: Backspace; return to group list
+- Select long-press: Send message
+- Up: Backspace/return to group list
 - Down: Shift > Caps lock > neither
 
-Future plans:
-- Send SMS with threads & message history
-- Button labels & indicator for caps lock
+Future plans (high-to-low priority):
 - Send confirmation
+- Button labels & indicator for caps lock
+- Pick a contact to send to instead of a thread
+- Type a number to send to instead of picking a thread
 - Customizable hotwords and emoticons
+- Message history (not entirely needed as Pebble has notification history)
 
 I am very new to C (and Pebble), so pull requests & issues are definitely welcome :)

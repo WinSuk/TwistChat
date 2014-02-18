@@ -17,11 +17,7 @@
  */
 
 #include <pebble.h>
-
-#define KEY_THREAD_LIST 0
-#define KEY_SEND_MESSAGE 1
-#define KEY_MESSAGE_SENT 2
-#define KEY_MESSAGE_NOT_SENT 3
+#include "keys.h"
 
 static Window *window;
 static TextLayer *text_layer_picker;
@@ -40,6 +36,8 @@ static char display[9];
 static char input[71];
 
 static bool is_up_held = false;
+
+static char phone_num[24];
 
 void del_last_char(char* name) {
   int i = 0;
@@ -94,9 +92,16 @@ static void down_click_handler(ClickRecognizerRef recognizer, void *context) {
 void select_long_click_handler(ClickRecognizerRef recognizer, void *context) {
   // Send message!
   text_layer_set_text(text_layer_input, "Sending...");
+  
+  int size = strlen(phone_num) + 1 + strlen(input);
+  char output[size];
+  strcpy(output, phone_num);
+  strcat(output, ";");
+  strcat(output, input);
+  
   DictionaryIterator *iter;
   app_message_outbox_begin(&iter);
-  dict_write_cstring(iter, KEY_SEND_MESSAGE, input);
+  dict_write_cstring(iter, KEY_SEND_MESSAGE, output);
   app_message_outbox_send();
 }
 
@@ -182,33 +187,17 @@ static void window_load(Window *window) {
 static void window_unload(Window *window) {
   text_layer_destroy(text_layer_picker);
   text_layer_destroy(text_layer_input);
+  
+  accel_data_service_unsubscribe();
+  light_enable(false);
 }
 
 static void handle_accel(AccelData *accel_data, uint32_t num_samples) {
   // do nothing
 }
 
-void out_sent_handler(DictionaryIterator *sent, void *context) {
-  // outgoing message was delivered
-}
-
-
-void out_failed_handler(DictionaryIterator *failed, AppMessageResult reason, void *context) {
-  // outgoing message failed
-}
-
-
-void in_received_handler(DictionaryIterator *received, void *context) {
-  // incoming message received
-  Tuple *msg_sent_tuple = dict_find(received, KEY_MESSAGE_SENT);
-  if (msg_sent_tuple) {
-    text_layer_set_text(text_layer_input, "Message sent!");
-  }
-}
-
-
-void in_dropped_handler(AppMessageResult reason, void *context) {
-  // incoming message dropped
+void input_message_sent(void) {
+  text_layer_set_text(text_layer_input, "Message sent!");
 }
 
 static void init(void) {
@@ -228,30 +217,13 @@ static void init(void) {
   accel_data_service_subscribe(0, handle_accel);
 
   timer = app_timer_register(100 /*milliseconds */, timer_callback, NULL);
-  
-  app_message_register_inbox_received(in_received_handler);
-  app_message_register_inbox_dropped(in_dropped_handler);
-  app_message_register_outbox_sent(out_sent_handler);
-  app_message_register_outbox_failed(out_failed_handler);
-
-  const uint32_t inbound_size = 64;
-  const uint32_t outbound_size = 64;
-  app_message_open(inbound_size, outbound_size);
 }
 
 static void deinit(void) {
   window_destroy(window);
-  
-  accel_data_service_unsubscribe();
-  
-  light_enable(false);
 }
 
-int main(void) {
+void input_main(char* number) {
+  strcpy(phone_num, number);
   init();
-
-  APP_LOG(APP_LOG_LEVEL_DEBUG, "Done initializing, pushed window: %p", window);
-
-  app_event_loop();
-  deinit();
 }
