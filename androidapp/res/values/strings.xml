@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">PebbleType</string>
+    
+    <string name="placeholder">There is nothing to change in the app right now, but some things are coming soon…</string>
+
+</resources>
