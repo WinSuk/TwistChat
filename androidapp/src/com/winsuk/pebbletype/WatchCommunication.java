@@ -44,8 +44,6 @@ public class WatchCommunication extends BroadcastReceiver {
 	private static final int KEY_MESSAGE_SENT = 3;
 	private static final int KEY_MESSAGE_NOT_SENT = 4;
 	
-	public static boolean isRegistered = false;
-	
 	@Override
 	public void onReceive(Context context, Intent intent) {
 		final UUID receivedUuid = (UUID)intent.getSerializableExtra("uuid");
