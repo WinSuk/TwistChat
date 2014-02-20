@@ -1,6 +1,5 @@
 Type and send SMS with your wrist - using Pebble's accelerometer!
 Great for short replies, and capable of long messages if desired.
-Pick from your 5 most recent threads to send a message.
 
 The typing UI is a bit lacking right now, so here are the controls:
 - Wrist rotate: Choose letter/letter group
