@@ -30,11 +30,13 @@ import android.net.Uri;
 import android.provider.ContactsContract;
 import android.provider.ContactsContract.PhoneLookup;
 import android.app.Activity;
+import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.telephony.SmsManager;
+import android.util.Log;
 
 public class WatchCommunication extends BroadcastReceiver {
 	private static final UUID PEBBLE_APP_UUID = UUID.fromString("16bb858b-fdde-479a-acd6-9b7678c147b0");
@@ -43,28 +45,41 @@ public class WatchCommunication extends BroadcastReceiver {
 	private static final int KEY_SEND_MESSAGE = 2;
 	private static final int KEY_MESSAGE_SENT = 3;
 	private static final int KEY_MESSAGE_NOT_SENT = 4;
+	private static final String ACTION_PEBBLE_RECEIVE = "com.getpebble.action.app.RECEIVE";
+	private static final String ACTION_SMS_REPLY = "com.winsuk.pebbletype.sms.REPLY";
 	
 	@Override
 	public void onReceive(Context context, Intent intent) {
-		final UUID receivedUuid = (UUID)intent.getSerializableExtra("uuid");
-
-		// Pebble-enabled apps are expected to be good citizens and only inspect broadcasts containing their UUID
-		if (!PEBBLE_APP_UUID.equals(receivedUuid)) {
-			return;
+		if (ACTION_PEBBLE_RECEIVE.equals(intent.getAction())) {
+			final UUID receivedUuid = (UUID)intent.getSerializableExtra("uuid");
+	
+			// Pebble-enabled apps are expected to be good citizens and only inspect broadcasts containing their UUID
+			if (!PEBBLE_APP_UUID.equals(receivedUuid)) {
+				return;
+			}
+	
+			final int transactionId = intent.getIntExtra("transaction_id", -1);
+			final String jsonData = intent.getStringExtra("msg_data");
+			if (jsonData == null || jsonData.isEmpty()) {
+				return;
+			}
+	
+			try {
+				final PebbleDictionary data = PebbleDictionary.fromJson(jsonData);
+				receiveData(context, transactionId, data);
+			} catch (JSONException e) {
+				e.printStackTrace();
+				return;
+			}
 		}
-
-		final int transactionId = intent.getIntExtra("transaction_id", -1);
-		final String jsonData = intent.getStringExtra("msg_data");
-		if (jsonData == null || jsonData.isEmpty()) {
-			return;
-		}
-
-		try {
-			final PebbleDictionary data = PebbleDictionary.fromJson(jsonData);
-			receiveData(context, transactionId, data);
-		} catch (JSONException e) {
-			e.printStackTrace();
-			return;
+		
+		if (ACTION_SMS_REPLY.equals(intent.getAction())) {
+			if (getResultCode() == Activity.RESULT_OK) {
+				sendByteToPebble(KEY_MESSAGE_SENT, (byte)1, context);
+			} else {
+				sendByteToPebble(KEY_MESSAGE_NOT_SENT, (byte)1, context);
+				Log.w("com.winsuk.pebbletype", "Message failed to send. Result code: " + getResultCode());
+			}
 		}
 	}
 	
@@ -84,9 +99,11 @@ public class WatchCommunication extends BroadcastReceiver {
 			
 			if (!demoMode) {
 				SmsManager sms = SmsManager.getDefault();
-				sms.sendTextMessage(address, null, message, null, null);
-				//TODO: sms.sendTextMessage(address, null, message, PendingIntent, null);
-				sendByteToPebble(KEY_MESSAGE_SENT, (byte)1, context);
+				
+				// Tried to use getService here which makes more sense, but that didn't work
+				PendingIntent pi = PendingIntent.getBroadcast(context, 0, new Intent(ACTION_SMS_REPLY), PendingIntent.FLAG_ONE_SHOT);
+				
+				sms.sendTextMessage(address, null, message, pi, null);
 			}
 		}
 	}

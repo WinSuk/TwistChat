@@ -31,6 +31,7 @@
             android:name="WatchCommunication" >
             <intent-filter>
                 <action android:name="com.getpebble.action.app.RECEIVE" />
+                <action android:name="com.winsuk.pebbletype.sms.REPLY" />
             </intent-filter>
         </receiver>
     </application>
