@@ -151,6 +151,10 @@ void in_received_handler(DictionaryIterator *received, void *context) {
   if (msg_sent_tuple) {
     input_message_sent();
   }
+  Tuple *msg_not_sent_tuple = dict_find(received, KEY_MESSAGE_NOT_SENT);
+  if (msg_not_sent_tuple) {
+    input_message_not_sent();
+  }
 }
 
 void in_dropped_handler(AppMessageResult reason, void *context) {

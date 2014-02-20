@@ -197,8 +197,13 @@ static void handle_accel(AccelData *accel_data, uint32_t num_samples) {
 }
 
 void input_message_sent(void) {
-  text_layer_set_text(text_layer_input, "Message sent!");
+  text_layer_set_text(text_layer_input, "Message sent.");
 }
+
+void input_message_not_sent(void) {
+  text_layer_set_text(text_layer_input, "Failed to send message!");
+}
+
 
 static void init(void) {
   window = window_create();
