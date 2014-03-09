@@ -42,16 +42,21 @@ static void menu_select_callback(int index, void *ctx) {
 }
 
 static void load_threads(void) {
+  int mi = 0;
+  
   for (int i = 0; i < NUM_THREADS; i++) {
-    menu_items[i] = (SimpleMenuItem) {
-      .title = names[i],
-      .subtitle = addresses[i],
-      .callback = menu_select_callback,
-    };
+    if (addresses[i][0] != '\0') {
+      menu_items[mi] = (SimpleMenuItem) {
+        .title = names[i],
+        .subtitle = addresses[i],
+        .callback = menu_select_callback,
+      };
+      mi++;
+    }
   }
 
   menu_sections[0] = (SimpleMenuSection){
-    .num_items = NUM_THREADS,
+    .num_items = mi,
     .items = menu_items,
   };
 
