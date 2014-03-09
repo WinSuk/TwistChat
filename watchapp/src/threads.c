@@ -94,7 +94,7 @@ static void window_unload(Window *window) {
 }
 
 void parse_list(char *threads) {
-  // Currently, pattern for each thread is "address;name\n"
+  // Currently, pattern for each thread is "address;name\n" (without quotes)
   int i = 0;
   uint pos = 0;
   uint last_pos = 0;
@@ -114,7 +114,7 @@ void parse_list(char *threads) {
 
 void threads_demo(void) {
   strcpy(names[0], "John Smith");
-  strcpy(names[1], "Joe Dirt");
+  strcpy(names[1], "Jane Smith");
   strcpy(names[2], "Bill");
   strcpy(names[3], "Lee");
   strcpy(names[4], "Mr President");
