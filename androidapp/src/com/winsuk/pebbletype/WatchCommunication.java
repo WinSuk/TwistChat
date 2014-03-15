@@ -155,8 +155,10 @@ public class WatchCommunication extends BroadcastReceiver {
 		}
 		msgCursor.close();
 		
+		int limit = (threads.size() <= 5 ? threads.size() : 5);
+		
 		String output = "";
-		for (int i = 0; i < threads.size(); i++) {
+		for (int i = 0; i < limit; i++) {
 			SMSThread thread = threads.get(i);
 			if (thread.name == "") thread.name = thread.address;
 			output = output + thread.address + ";" + thread.name + "\n";
