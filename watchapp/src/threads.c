@@ -164,6 +164,50 @@ void in_received_handler(DictionaryIterator *received, void *context) {
 
 void in_dropped_handler(AppMessageResult reason, void *context) {
   // incoming message dropped
+  switch (reason) {
+    case APP_MSG_OK:
+      text_layer_set_text(text_layer_main, "Error!\nAPP_MSG_OK");
+      break;
+    case APP_MSG_SEND_TIMEOUT:
+      text_layer_set_text(text_layer_main, "Error!\nAPP_MSG_SEND_TIMEOUT");
+      break;
+    case APP_MSG_SEND_REJECTED:
+      text_layer_set_text(text_layer_main, "Error!\nAPP_MSG_SEND_REJECTED");
+      break;
+    case APP_MSG_NOT_CONNECTED:
+      text_layer_set_text(text_layer_main, "Error!\nAPP_MSG_NOT_CONNECTED");
+      break;
+    case APP_MSG_APP_NOT_RUNNING:
+      text_layer_set_text(text_layer_main, "Error!\nAPP_MSG_APP_NOT_RUNNING");
+      break;
+    case APP_MSG_INVALID_ARGS:
+      text_layer_set_text(text_layer_main, "Error!\nAPP_MSG_INVALID_ARGS");
+      break;
+    case APP_MSG_BUSY:
+      text_layer_set_text(text_layer_main, "Error!\nAPP_MSG_BUSY");
+      break;
+    case APP_MSG_BUFFER_OVERFLOW:
+      text_layer_set_text(text_layer_main, "Error!\nAPP_MSG_BUFFER_OVERFLOW");
+      break;
+    case APP_MSG_ALREADY_RELEASED:
+      text_layer_set_text(text_layer_main, "Error!\nAPP_MSG_ALREADY_RELEASED");
+      break;
+    case APP_MSG_CALLBACK_ALREADY_REGISTERED:
+      text_layer_set_text(text_layer_main, "Error!\nAPP_MSG_CALLBACK_ALREADY_REGISTERED");
+      break;
+    case APP_MSG_CALLBACK_NOT_REGISTERED:
+      text_layer_set_text(text_layer_main, "Error!\nAPP_MSG_CALLBACK_NOT_REGISTERED");
+      break;
+    case APP_MSG_OUT_OF_MEMORY:
+      text_layer_set_text(text_layer_main, "Error!\nAPP_MSG_OUT_OF_MEMORY");
+      break;
+    case APP_MSG_CLOSED:
+      text_layer_set_text(text_layer_main, "Error!\nAPP_MSG_CLOSED");
+      break;
+    case APP_MSG_INTERNAL_ERROR:
+      text_layer_set_text(text_layer_main, "Error!\nAPP_MSG_INTERNAL_ERROR");
+      break;
+  }
 }
 
 int main(void) {
