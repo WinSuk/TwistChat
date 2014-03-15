@@ -74,12 +74,13 @@ public class WatchCommunication extends BroadcastReceiver {
 		}
 		
 		if (ACTION_SMS_REPLY.equals(intent.getAction())) {
-			if (getResultCode() == Activity.RESULT_OK) {
-				sendByteToPebble(KEY_MESSAGE_SENT, (byte)1, context);
-			} else {
-				sendByteToPebble(KEY_MESSAGE_NOT_SENT, (byte)1, context);
-				Log.w("com.winsuk.pebbletype", "Message failed to send. Result code: " + getResultCode());
-			}
+			boolean sent = getResultCode() == Activity.RESULT_OK;
+			
+			if (!sent) Log.w("com.winsuk.pebbletype", "Message failed to send. Result code: " + getResultCode());
+			
+			PebbleDictionary data = new PebbleDictionary();
+			data.addUint8(sent ? KEY_MESSAGE_SENT : KEY_MESSAGE_NOT_SENT, (byte)1);
+			PebbleKit.sendDataToPebble(context, PEBBLE_APP_UUID, data);
 		}
 	}
 	
@@ -165,18 +166,8 @@ public class WatchCommunication extends BroadcastReceiver {
 				output = output + thread.messages.get(ii) + "\n";
 			}*/
 		}
-		sendStringToPebble(KEY_THREAD_LIST, output, context);
-	}
-	
-	private void sendStringToPebble(int key, String str, Context context) {
 		PebbleDictionary data = new PebbleDictionary();
-		data.addString(key, str);
-		PebbleKit.sendDataToPebble(context, PEBBLE_APP_UUID, data);
-	}
-	
-	private void sendByteToPebble(int key, byte byt, Context context) {
-		PebbleDictionary data = new PebbleDictionary();
-		data.addUint8(key, byt);
+		data.addString(KEY_THREAD_LIST, output);
 		PebbleKit.sendDataToPebble(context, PEBBLE_APP_UUID, data);
 	}
 
