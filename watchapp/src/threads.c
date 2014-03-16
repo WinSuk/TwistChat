@@ -104,6 +104,10 @@ void parse_list(char *threads) {
       last_pos = pos + 1;
     }
     if (threads[pos] == '\n') {
+      if (pos - last_pos == 0) {
+        // Fill blank name with number
+        strcpy(names[i], addresses[i]);
+      }
       strncpy(names[i], &threads[last_pos], pos - last_pos);
       last_pos = pos + 1;
       i++;

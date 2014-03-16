@@ -160,7 +160,6 @@ public class WatchCommunication extends BroadcastReceiver {
 		String output = "";
 		for (int i = 0; i < limit; i++) {
 			SMSThread thread = threads.get(i);
-			if (thread.name == "") thread.name = thread.address;
 			output = output + thread.address + ";" + thread.name + "\n";
 			
 			/* List messages
