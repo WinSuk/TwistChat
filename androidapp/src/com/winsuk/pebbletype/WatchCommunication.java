@@ -40,11 +40,15 @@ import android.util.Log;
 
 public class WatchCommunication extends BroadcastReceiver {
 	private static final UUID PEBBLE_APP_UUID = UUID.fromString("16bb858b-fdde-479a-acd6-9b7678c147b0");
+	
 	private static final int KEY_REQUEST_THREAD_LIST = 0;
 	private static final int KEY_THREAD_LIST = 1;
 	private static final int KEY_SEND_MESSAGE = 2;
 	private static final int KEY_MESSAGE_SENT = 3;
 	private static final int KEY_MESSAGE_NOT_SENT = 4;
+	
+	private static final int THREAD_LIMIT = 4;
+	
 	private static final String ACTION_PEBBLE_RECEIVE = "com.getpebble.action.app.RECEIVE";
 	private static final String ACTION_SMS_REPLY = "com.winsuk.pebbletype.sms.REPLY";
 	
@@ -155,7 +159,7 @@ public class WatchCommunication extends BroadcastReceiver {
 		}
 		msgCursor.close();
 		
-		int limit = (threads.size() <= 5 ? threads.size() : 5);
+		int limit = (threads.size() <= THREAD_LIMIT ? threads.size() : THREAD_LIMIT);
 		
 		String output = "";
 		for (int i = 0; i < limit; i++) {
