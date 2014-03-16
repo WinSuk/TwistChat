@@ -147,18 +147,21 @@ void out_failed_handler(DictionaryIterator *failed, AppMessageResult reason, voi
 
 void in_received_handler(DictionaryIterator *received, void *context) {
   // incoming message received
-  Tuple *thread_list_tuple = dict_find(received, KEY_THREAD_LIST);
-  if (thread_list_tuple) {
-    parse_list(thread_list_tuple->value->cstring);
-    load_threads();
-  }
-  Tuple *msg_sent_tuple = dict_find(received, KEY_MESSAGE_SENT);
-  if (msg_sent_tuple) {
-    input_message_sent();
-  }
-  Tuple *msg_not_sent_tuple = dict_find(received, KEY_MESSAGE_NOT_SENT);
-  if (msg_not_sent_tuple) {
-    input_message_not_sent();
+  Tuple *tuple = dict_read_first(received);
+  while (tuple) {
+    switch (tuple->key) {
+      case KEY_THREAD_LIST:
+        parse_list(tuple->value->cstring);
+	load_threads();
+        break;
+      case KEY_MESSAGE_SENT:
+        input_message_sent();
+        break;
+      case KEY_MESSAGE_NOT_SENT:
+        input_message_not_sent();
+        break;
+    }
+    tuple = dict_read_next(received);
   }
 }
 
