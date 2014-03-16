@@ -160,33 +160,35 @@ public class WatchCommunication extends BroadcastReceiver {
 		msgCursor.close();
 		
 		int limit = (threads.size() <= THREAD_LIMIT ? threads.size() : THREAD_LIMIT);
-		
-		// Calculate how many characters names can take up
-		int availibleCharacters = 120;
-		for (int i = 0; i < limit; i++) {
-			availibleCharacters -= threads.get(i).address.length();
-			availibleCharacters -= 2; //for ; and \n
-		}
-		int maxNameLength = availibleCharacters / limit - 3;
-		
 		String output = "";
-		for (int i = 0; i < limit; i++) {
-			SMSThread thread = threads.get(i);
-			
-			String name = "";
-			if (thread.name.length() < maxNameLength) {
-				name = thread.name;
-			} else {
-				name = thread.name.substring(0, maxNameLength -1);
-				name += "…";
+		
+		if (limit > 0) {
+			// Calculate how many characters names can take up
+			int availibleCharacters = 120;
+			for (int i = 0; i < limit; i++) {
+				availibleCharacters -= threads.get(i).address.length();
+				availibleCharacters -= 2; //for ; and \n
 			}
+			int maxNameLength = availibleCharacters / limit - 3;
 			
-			output = output + thread.address + ";" + name + "\n";
-			
-			/* List messages
-			for (int ii = 0; ii < thread.messages.size(); ii++) {
-				output = output + thread.messages.get(ii) + "\n";
-			}*/
+			for (int i = 0; i < limit; i++) {
+				SMSThread thread = threads.get(i);
+				
+				String name = "";
+				if (thread.name.length() < maxNameLength) {
+					name = thread.name;
+				} else {
+					name = thread.name.substring(0, maxNameLength -1);
+					name += "…";
+				}
+				
+				output = output + thread.address + ";" + name + "\n";
+				
+				/* List messages
+				for (int ii = 0; ii < thread.messages.size(); ii++) {
+					output = output + thread.messages.get(ii) + "\n";
+				}*/
+			}
 		}
 		PebbleDictionary data = new PebbleDictionary();
 		data.addString(KEY_THREAD_LIST, output);
