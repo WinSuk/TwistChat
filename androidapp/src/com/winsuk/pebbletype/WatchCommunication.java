@@ -145,14 +145,16 @@ public class WatchCommunication extends BroadcastReceiver {
 					th.thread_id = thread_id;
 					th.address = address;
 					th.name = name;
-					th.messages = new ArrayList<String>();
+					//th.messages = new ArrayList<String>();
 					threads.add(th);
 				}
 				
+				/* TODO: this line is causing crashes on select few devices
 				String body = msgCursor.getString(msgCursor.getColumnIndexOrThrow("body")).toString();
 				if (th.messages.size() < 5) {
 					th.messages.add(body);
 				}
+				*/
 				
 				msgCursor.moveToNext();
 			}
