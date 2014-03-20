@@ -135,6 +135,7 @@ static void up_click_handler(ClickRecognizerRef recognizer, void *context) {
     if (selected_set == -1) {
       del_last_char(input);
       text_layer_set_text(text_layer_input, input);
+      if (input[0] == '\0' && caps == CAPS_OFF) set_caps(CAPS_SHIFT);
     } else {
       selected_set = -1;
     }
