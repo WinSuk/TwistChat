@@ -26,6 +26,8 @@ static TextLayer *text_layer_input;
 static ActionBarLayer *action_bar;
 static GBitmap *backspace_icon;
 static GBitmap *caps_icon;
+static GBitmap *confirm_icon;
+static GBitmap *cancel_icon;
 
 static AppTimer *timer;
 
@@ -45,6 +47,8 @@ static char input[71];
 static bool is_up_held = false;
 
 static char phone_num[24];
+
+static bool send_confirm = false;
 
 void del_last_char(char* name) {
   int i = 0;
@@ -97,39 +101,65 @@ static void select_click_handler(ClickRecognizerRef recognizer, void *context) {
   }
 }
 
+static void unload_send_confirm(void) {
+  action_bar_layer_set_icon(action_bar, BUTTON_ID_UP, backspace_icon);
+  set_caps(caps);
+  gbitmap_destroy(confirm_icon);
+  gbitmap_destroy(cancel_icon);
+  confirm_icon = NULL;
+  cancel_icon = NULL;
+  send_confirm = false;
+}
+
 static void up_click_handler(ClickRecognizerRef recognizer, void *context) {
-  // Backspace/back to group list
-  if (selected_set == -1) {
-    del_last_char(input);
-    text_layer_set_text(text_layer_input, input);
+  if (send_confirm) {
+    // Send message!
+    text_layer_set_text(text_layer_input, "Sending...");
+    
+    int size = strlen(phone_num) + 1 + strlen(input);
+    char output[size];
+    strcpy(output, phone_num);
+    strcat(output, ";");
+    strcat(output, input);
+    
+    DictionaryIterator *iter;
+    app_message_outbox_begin(&iter);
+    dict_write_cstring(iter, KEY_SEND_MESSAGE, output);
+    app_message_outbox_send();
+    
+    unload_send_confirm();
   } else {
-    selected_set = -1;
+    // Backspace/back to group list
+    if (selected_set == -1) {
+      del_last_char(input);
+      text_layer_set_text(text_layer_input, input);
+    } else {
+      selected_set = -1;
+    }
   }
 }
 
 static void down_click_handler(ClickRecognizerRef recognizer, void *context) {
-  // Shift/caps
-  if (caps == CAPS_ON) {
-    set_caps(CAPS_OFF);
+  if (send_confirm) {
+    // Cancel
+    unload_send_confirm();
   } else {
-    set_caps(caps + 1);
+    // Shift/caps
+    if (caps == CAPS_ON) {
+      set_caps(CAPS_OFF);
+    } else {
+      set_caps(caps + 1);
+    }
   }
 }
 
 void select_long_click_handler(ClickRecognizerRef recognizer, void *context) {
-  // Send message!
-  text_layer_set_text(text_layer_input, "Sending...");
-  
-  int size = strlen(phone_num) + 1 + strlen(input);
-  char output[size];
-  strcpy(output, phone_num);
-  strcat(output, ";");
-  strcat(output, input);
-  
-  DictionaryIterator *iter;
-  app_message_outbox_begin(&iter);
-  dict_write_cstring(iter, KEY_SEND_MESSAGE, output);
-  app_message_outbox_send();
+  send_confirm = true;
+  confirm_icon = gbitmap_create_with_resource(RESOURCE_ID_ICON_CONFIRM);
+  action_bar_layer_set_icon(action_bar, BUTTON_ID_UP, confirm_icon);
+  cancel_icon = gbitmap_create_with_resource(RESOURCE_ID_ICON_CANCEL);
+  action_bar_layer_set_icon(action_bar, BUTTON_ID_DOWN, cancel_icon);
+  text_layer_set_text(text_layer_picker, "Send?");
 }
 
 void select_long_click_release_handler(ClickRecognizerRef recognizer, void *context) {
@@ -164,31 +194,33 @@ static void click_config_provider(void *context) {
 }
 
 static void timer_callback(void *data) {
-  AccelData accel = (AccelData) { .x = 0, .y = 0, .z = 0 };
-  accel_service_peek(&accel);
-  
-  accel.y = accel.y + 200; //low limit of 200
-  accel.y = -accel.y;
-  if (accel.y < 0) accel.y = 0;
-  if (accel.y > 600) accel.y = 600; //high limit of 800 (600 after low limit)
-  
-  selected_item = accel.y / 85;
-  
-  if (selected_set == -1) {
-    if (selected_item == 7) {
-      strcpy(display, "Space");
+  if (!send_confirm) {
+    AccelData accel = (AccelData) { .x = 0, .y = 0, .z = 0 };
+    accel_service_peek(&accel);
+    
+    accel.y = accel.y + 200; //low limit of 200
+    accel.y = -accel.y;
+    if (accel.y < 0) accel.y = 0;
+    if (accel.y > 600) accel.y = 600; //high limit of 800 (600 after low limit)
+    
+    selected_item = accel.y / 85;
+    
+    if (selected_set == -1) {
+      if (selected_item == 7) {
+	strcpy(display, "Space");
+      } else {
+	strcpy(display, sets[selected_item]);
+      }
     } else {
-      strcpy(display, sets[selected_item]);
+      display[0] = sets[selected_set][selected_item];
+      if (caps && display[0] >= 0x61 && display[0] <= 0x7a) {
+	display[0] -= 0x20;
+      }
+      display[1] = '\0';
     }
-  } else {
-    display[0] = sets[selected_set][selected_item];
-    if (caps && display[0] >= 0x61 && display[0] <= 0x7a) {
-      display[0] -= 0x20;
-    }
-    display[1] = '\0';
+    
+    text_layer_set_text(text_layer_picker, display);
   }
-  
-  text_layer_set_text(text_layer_picker, display);
   
   timer = app_timer_register(100 /* milliseconds */, timer_callback, NULL);
 }
