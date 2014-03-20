@@ -222,6 +222,9 @@ static void init(void) {
   // Keep the backlight on
   light_enable(true);
   
+  // Reset in case of resume
+  selected_set = -1;
+  
   // Passing 0 to subscribe sets up the accelerometer for peeking
   accel_data_service_subscribe(0, handle_accel);
 
