@@ -23,14 +23,21 @@ static Window *window;
 static TextLayer *text_layer_picker;
 static TextLayer *text_layer_input;
 
+static ActionBarLayer *action_bar;
+static GBitmap *backspace_icon;
+static GBitmap *caps_icon;
+
 static AppTimer *timer;
 
 static const char *sets[] = {"abcdefgh", "ijklmnop", "qrstuvwx", "yz.,?!12", "34567890", "';:@#$%\"", "^&*()-_/", " "};
 
 static int selected_item = 0;
 static int selected_set = -1; //-1 for set picker
-static bool shift = true;
-static bool caps = false;
+
+#define CAPS_OFF 0
+#define CAPS_SHIFT 1
+#define CAPS_ON 2
+static int caps = CAPS_SHIFT;
 
 static char display[9];
 static char input[71];
@@ -47,6 +54,29 @@ void del_last_char(char* name) {
   name[i-1] = '\0';
 }
 
+static void set_caps(int state) {
+  int resource;
+  switch (state) {
+    case CAPS_OFF:
+      resource = RESOURCE_ID_ICON_CAPS_OFF;
+      break;
+    case CAPS_SHIFT:
+      resource = RESOURCE_ID_ICON_CAPS_SHIFT;
+      break;
+    case CAPS_ON:
+      resource = RESOURCE_ID_ICON_CAPS_ON;
+      break;
+    default:
+      resource = RESOURCE_ID_ICON_CAPS_OFF;
+      break;
+  }
+  action_bar_layer_clear_icon(action_bar, BUTTON_ID_DOWN);
+  if (caps_icon != NULL) gbitmap_destroy(caps_icon);
+  caps_icon = gbitmap_create_with_resource(resource);
+  action_bar_layer_set_icon(action_bar, BUTTON_ID_DOWN, caps_icon);
+  caps = state;
+}
+
 static void select_click_handler(ClickRecognizerRef recognizer, void *context) {
   if (selected_set == -1 && selected_item == 7) {
     // Handle Space
@@ -58,9 +88,9 @@ static void select_click_handler(ClickRecognizerRef recognizer, void *context) {
     selected_set = selected_item;
   } else {
     input[strlen(input)] = sets[selected_set][selected_item];
-    if (shift) {
+    if (caps != CAPS_OFF) {
       input[strlen(input) -1] -= 0x20;
-      if (!caps) shift = false;
+      if (caps == CAPS_SHIFT) set_caps(CAPS_OFF);
     }
     text_layer_set_text(text_layer_input, input);
     selected_set = -1;
@@ -79,13 +109,10 @@ static void up_click_handler(ClickRecognizerRef recognizer, void *context) {
 
 static void down_click_handler(ClickRecognizerRef recognizer, void *context) {
   // Shift/caps
-  if (caps) {
-    caps = false;
-    shift = false;
-  } else if (shift) {
-    caps = true;
+  if (caps == CAPS_ON) {
+    set_caps(CAPS_OFF);
   } else {
-    shift = true;
+    set_caps(caps + 1);
   }
 }
 
@@ -155,7 +182,7 @@ static void timer_callback(void *data) {
     }
   } else {
     display[0] = sets[selected_set][selected_item];
-    if (shift && display[0] >= 0x61 && display[0] <= 0x7a) {
+    if (caps && display[0] >= 0x61 && display[0] <= 0x7a) {
       display[0] -= 0x20;
     }
     display[1] = '\0';
@@ -170,8 +197,17 @@ static void window_load(Window *window) {
   Layer *window_layer = window_get_root_layer(window);
   GRect bounds = layer_get_bounds(window_layer);
   
+  // Action bar
+  action_bar = action_bar_layer_create();
+  action_bar_layer_add_to_window(action_bar, window);
+  action_bar_layer_set_click_config_provider(action_bar, click_config_provider);
+  backspace_icon = gbitmap_create_with_resource(RESOURCE_ID_ICON_BACKSPACE);
+  action_bar_layer_set_icon(action_bar, BUTTON_ID_UP, backspace_icon);
+  // set_caps already does the icon loading for us
+  set_caps(CAPS_SHIFT);
+  
   // Input
-  text_layer_input = text_layer_create((GRect) { .origin = { 0, 0 }, .size = { bounds.size.w, bounds.size.h / 2 } });
+  text_layer_input = text_layer_create((GRect) { .origin = { 0, 0 }, .size = { bounds.size.w - ACTION_BAR_WIDTH, bounds.size.h / 2 } });
   if (input[0] == '\0') {
     text_layer_set_text(text_layer_input, "Ready");
   } else {
@@ -181,7 +217,7 @@ static void window_load(Window *window) {
   layer_add_child(window_layer, text_layer_get_layer(text_layer_input));
   
   // Picker
-  text_layer_picker = text_layer_create((GRect) { .origin = { 0, bounds.size.h / 2 }, .size = { bounds.size.w, bounds.size.h } });
+  text_layer_picker = text_layer_create((GRect) { .origin = { 0, bounds.size.h / 2 }, .size = { bounds.size.w - ACTION_BAR_WIDTH, bounds.size.h } });
   text_layer_set_text(text_layer_picker, "...");
   text_layer_set_text_alignment(text_layer_picker, GTextAlignmentCenter);
   text_layer_set_font(text_layer_picker, fonts_get_system_font(FONT_KEY_BITHAM_30_BLACK));
@@ -191,6 +227,13 @@ static void window_load(Window *window) {
 static void window_unload(Window *window) {
   text_layer_destroy(text_layer_picker);
   text_layer_destroy(text_layer_input);
+  
+  action_bar_layer_destroy(action_bar);
+  gbitmap_destroy(backspace_icon);
+  gbitmap_destroy(caps_icon);
+  action_bar = NULL;
+  backspace_icon = NULL;
+  caps_icon = NULL;
   
   accel_data_service_unsubscribe();
   light_enable(false);
@@ -211,7 +254,6 @@ void input_message_not_sent(void) {
 
 static void init(void) {
   window = window_create();
-  window_set_click_config_provider(window, click_config_provider);
   window_set_window_handlers(window, (WindowHandlers) {
     .load = window_load,
     .unload = window_unload,
