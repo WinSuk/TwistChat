@@ -74,8 +74,10 @@ static void set_caps(int state) {
       resource = RESOURCE_ID_ICON_CAPS_OFF;
       break;
   }
-  action_bar_layer_clear_icon(action_bar, BUTTON_ID_DOWN);
-  if (caps_icon != NULL) gbitmap_destroy(caps_icon);
+  if (caps_icon != NULL) {
+    action_bar_layer_clear_icon(action_bar, BUTTON_ID_DOWN);
+    gbitmap_destroy(caps_icon);
+  }
   caps_icon = gbitmap_create_with_resource(resource);
   action_bar_layer_set_icon(action_bar, BUTTON_ID_DOWN, caps_icon);
   caps = state;
