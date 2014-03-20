@@ -172,7 +172,11 @@ static void window_load(Window *window) {
   
   // Input
   text_layer_input = text_layer_create((GRect) { .origin = { 0, 0 }, .size = { bounds.size.w, bounds.size.h / 2 } });
-  text_layer_set_text(text_layer_input, "Ready");
+  if (input[0] == '\0') {
+    text_layer_set_text(text_layer_input, "Ready");
+  } else {
+    text_layer_set_text(text_layer_input, input);
+  }
   text_layer_set_font(text_layer_input, fonts_get_system_font(FONT_KEY_GOTHIC_18_BOLD));
   layer_add_child(window_layer, text_layer_get_layer(text_layer_input));
   
