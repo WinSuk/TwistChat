@@ -93,11 +93,14 @@ static void select_click_handler(ClickRecognizerRef recognizer, void *context) {
   if (selected_set == -1) {
     selected_set = selected_item;
   } else {
-    input[strlen(input)] = sets[selected_set][selected_item];
+    char ch = sets[selected_set][selected_item];
     if (caps != CAPS_OFF) {
-      input[strlen(input) -1] -= 0x20;
+      if (ch >= 0x61 && ch <= 0x7a) {
+        ch -= 0x20;
+      }
       if (caps == CAPS_SHIFT) set_caps(CAPS_OFF);
     }
+    input[strlen(input)] = ch;
     text_layer_set_text(text_layer_input, input);
     selected_set = -1;
   }
