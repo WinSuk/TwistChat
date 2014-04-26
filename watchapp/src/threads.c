@@ -45,7 +45,7 @@ static void load_threads(void) {
   int mi = 0;
   
   for (int i = 0; i < NUM_THREADS; i++) {
-    if (addresses[i][0] != '\0') {
+    if (addresses[i][0] != '\0' || names[i][0] != '\0') {
       menu_items[mi] = (SimpleMenuItem) {
         .title = names[i],
         .subtitle = addresses[i],
@@ -120,9 +120,8 @@ void threads_demo(void) {
   strcpy(names[0], "John Smith");
   strcpy(names[1], "Jane Smith");
   strcpy(names[2], "Bill");
-  strcpy(names[3], "Lee");
-  strcpy(names[4], "Mr President");
-  for (int i = 0; i < 5; i++) {
+  strcpy(names[3], "Mr President");
+  for (int i = 0; i < 4; i++) {
     strcpy(addresses[i], "");
   }
 }
