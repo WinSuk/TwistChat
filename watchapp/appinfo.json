@@ -1,10 +1,10 @@
 {
   "uuid": "16bb858b-fdde-479a-acd6-9b7678c147b0",
-  "shortName": "PebbleType",
-  "longName": "PebbleType",
+  "shortName": "Twist Chat",
+  "longName": "Twist Chat",
   "companyName": "WinSuk",
-  "versionCode": 9,
-  "versionLabel": "1.0.2",
+  "versionCode": 10,
+  "versionLabel": "1.0.3",
   "watchapp": {
     "watchface": false
   },

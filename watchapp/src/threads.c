@@ -1,5 +1,5 @@
 /*    
- *  PebbleType for Pebble smartwatches
+ *  Twist Chat
  *  Copyright (C) 2014 - WinSuk (winsuk@winsuk.net)
  * 
  *  This program is free software: you can redistribute it and/or modify
